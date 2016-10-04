@@ -1,0 +1,18 @@
+int val; 
+int tempPin = 1; // The temperature sensor is connected to AnalogPin 1 (A1)
+void setup()
+{
+Serial.begin(9600); // This will set the bits per second(bps) transfer rate as 9600
+}
+void loop()
+{
+val = analogRead(tempPin); // val is set with the value read from AnalogPin 1
+float mv = (val/1024.0)*5000; 
+float cel = mv/10; // 10mV rise is proportional to 1 degree rise in temperature 
+float farh = (cel*9)/5 + 32; // If temperature is required in Fahrenheit 
+Serial.print("Temperature:");
+Serial.print(cel);
+Serial.print("*C");
+Serial.println();
+delay(1000);
+}
