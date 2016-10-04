@@ -1,3 +1,4 @@
+// LM35 Temperature Sensor 
 int val; 
 int tempPin = 1; // The temperature sensor is connected to AnalogPin 1 (A1)
 void setup()
