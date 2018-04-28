@@ -4,6 +4,9 @@ void setup() {
 
 void loop() {
  Serial.print("Hello World");
+ Serial.print("\n");
+ delay(1000);
+
 }
 
 
