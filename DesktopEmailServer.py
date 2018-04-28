@@ -27,12 +27,13 @@ def send_email():
 
 print "Starting the DesktopEmailServer.py script..."
 while True:
-	message = ser.read()
-	if message > 0:
-		print "Read a message! Yay!"
+	# message = ser.read()
+	# if message > 0:
+		# print "Read a message! Yay!"
 
-	# message = ser.readline()
-	# print(message)
+	message = ser.readline()
+	print(message)
+	print "Read a message! Yay!"
 	# if message[0] == 'H' :
 		# send_email()
-	# time.sleep(0.5)
+	time.sleep(1)
