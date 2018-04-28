@@ -4,11 +4,16 @@
 OneWire LiquidTemp_oneWire(LIQUIDTEMP_ONE_WIRE_BUS); //For Liquid Temperature Sensor
 DallasTemperature LiquidTemp_sensors(&LiquidTemp_oneWire); //For Liquid Temperature Sensor
 int soil_moisture_sensor_pin = A0; // For Soil Moisture Sensor
+int ThermistorTemp_ThermistorPin = A1; //Thermistor Temperature Analog Pin
+
 
 void setup() {
 
+  Serial.begin(9600); 
   LiquidTemp_Setup(); //For Liquid Temperature Sensor
   SoilMoistureSetup(); // For Soil Moisture Sensor
+  ThermistorTemp_Setup(); // For Thermistor Temperature Sensor
+
 
 
    }
@@ -21,13 +26,21 @@ void loop() {
                                 
   Serial.print(Liquid_Temp); //For Liquid Temperature Sensor
 
-  int Soil_Moisture = SoilMoistureLoop();
+  int Soil_Moisture = SoilMoistureLoop(); // For Soil Moisture Sensor
 
    Serial.print("Moisture : "); // For Soil Moisture Sensor
 
    Serial.print(Soil_Moisture); // For Soil Moisture Sensor
 
    Serial.println("%"); // For Soil Moisture Sensor
+
+  int Temperature_Thermistor_Output = ThermistorTemp_Loop(); // For Thermistor Temperature Sensor
+  
+  Serial.print("Temperature in Celcius: "); // For Thermistor Temperature Sensor
+  
+  Serial.print(Temperature_Thermistor_Output); // For Thermistor Temperature Sensor
+  
+  Serial.println(" C"); // For Thermistor Temperature Sensor
    
 
 delay(1000);
@@ -39,8 +52,6 @@ void LiquidTemp_Setup() // Liquid Temperature Setup
 
 {
   // start serial port 
- 
- Serial.begin(9600); 
  
  Serial.println("Dallas Temperature IC Control Library Demo"); 
  
@@ -64,16 +75,10 @@ int LiquidTemp_Loop() //Liquid Temperature Loop
 
 }
 
-
-
 void SoilMoistureSetup() // Soil Moisture Setup
 {
 
- Serial.begin(9600);
-
    Serial.println("Reading From the Sensor ...");
-
-   delay(2000);
 
 }
 
@@ -87,5 +92,34 @@ int SoilMoistureLoop() //Soil Moisture Loop
    output_value = map(output_value,550,0,0,100);
    
    return output_value;
+}
+
+void ThermistorTemp_Setup()
+{
+
+}
+
+int ThermistorTemp_Loop()
+{
+  int ThermistorTemp_Vo;
+  
+  float ThermistorTemp_R1 = 10000;
+  
+  float ThermistorTemp_logR2, ThermistorTemp_R2, ThermistorTemp_T, ThermistorTemp_Tc;
+  
+  float ThermistorTemp_c1 = 1.009249522e-03, ThermistorTemp_c2 = 2.378405444e-04, ThermistorTemp_c3 = 2.019202697e-07;
+
+  ThermistorTemp_Vo = analogRead(ThermistorTemp_ThermistorPin);
+  
+  ThermistorTemp_R2 = ThermistorTemp_R1 * (1023.0 / (float)ThermistorTemp_Vo - 1.0);
+  
+  ThermistorTemp_logR2 = log(ThermistorTemp_R2);
+  
+  ThermistorTemp_T = (1.0 / (ThermistorTemp_c1 + ThermistorTemp_c2*ThermistorTemp_logR2 + ThermistorTemp_c3*ThermistorTemp_logR2*ThermistorTemp_logR2*ThermistorTemp_logR2));
+  
+  ThermistorTemp_Tc = ThermistorTemp_T - 273.15;
+  
+  return ThermistorTemp_Tc;
+  
 }
 
