@@ -3,19 +3,11 @@ import serial
 import smtplib
 
 
-# TO = 'putyour@email.here'
-# GMAIL_USER = 'putyour@email.here'
-# GMAIL_PASS = 'putyourpasswordhere'
-# SUBJECT = 'Intrusion!!'
-# TEXT = 'Your PIR sensor detected movement'
-
-
 TO = 'soorya.annadurai@gmail.com'
 GMAIL_USER = 'missile.blast@gmail.com'
 GMAIL_PASS = 'Cannonballs13'
 SUBJECT = 'Test subject'
 TEXT = 'Sample text in the email. Cheers!'
-# ser = serial.Serial('COM4', 9600)
 ser = serial.Serial('/dev/cu.usbmodem1411', 9600)
 
 
@@ -33,10 +25,14 @@ def send_email():
 	smtpserver.sendmail(GMAIL_USER, TO, msg)
 	smtpserver.close()
 
+print "Starting the DesktopEmailServer.py script..."
 while True:
-	message = ser.readline()
-	print(message)
-	if message[0] == 'H' :
-		send_email()
-	time.sleep(0.5)
-# send_email()
+	message = ser.read()
+	if message > 0:
+		print "Read a message! Yay!"
+
+	# message = ser.readline()
+	# print(message)
+	# if message[0] == 'H' :
+		# send_email()
+	# time.sleep(0.5)
