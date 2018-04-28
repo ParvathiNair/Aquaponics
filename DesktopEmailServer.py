@@ -15,7 +15,8 @@ GMAIL_USER = 'missile.blast@gmail.com'
 GMAIL_PASS = 'Cannonballs13'
 SUBJECT = 'Test subject'
 TEXT = 'Sample text in the email. Cheers!'
-ser = serial.Serial('COM4', 9600)
+# ser = serial.Serial('COM4', 9600)
+ser = serial.Serial('/dev/cu.usbmodem1411', 9600)
 
 
 def send_email():
