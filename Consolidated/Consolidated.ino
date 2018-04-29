@@ -1,8 +1,11 @@
 #include <DallasTemperature.h> //For Liquid Temperature Sensor
-#include <OneWire.h> //For Liquid Temperature Sensor
-#define LIQUIDTEMP_ONE_WIRE_BUS 2 // Digital Pin 2 
+#include <OneWire.h> // For Liquid Temperature Sensor
+#include <dht.h> // For DHT11 Temperature Sensor 
+#define LIQUIDTEMP_ONE_WIRE_BUS 2 // Digital Pin 2 for Liquid Temperature Sensor 
+#define DHT11Temp_PIN 7 // Digital Pin 7 for DHT11 Temperature Sensor
 OneWire LiquidTemp_oneWire(LIQUIDTEMP_ONE_WIRE_BUS); //For Liquid Temperature Sensor
 DallasTemperature LiquidTemp_sensors(&LiquidTemp_oneWire); //For Liquid Temperature Sensor
+dht DHT11Temp_DHT; //For DHT11 Temperature Sensor
 int soil_moisture_sensor_pin = A0; // For Soil Moisture Sensor
 int ThermistorTemp_ThermistorPin = A1; //Thermistor Temperature Analog Pin
 
@@ -13,8 +16,7 @@ void setup() {
   LiquidTemp_Setup(); //For Liquid Temperature Sensor
   SoilMoistureSetup(); // For Soil Moisture Sensor
   ThermistorTemp_Setup(); // For Thermistor Temperature Sensor
-
-
+  DHT11Temp_Setup(); // For DHT11 Temperature Sensor
 
    }
 
@@ -28,11 +30,11 @@ void loop() {
 
   int Soil_Moisture = SoilMoistureLoop(); // For Soil Moisture Sensor
 
-   Serial.print("Moisture : "); // For Soil Moisture Sensor
+  Serial.print("Moisture : "); // For Soil Moisture Sensor
 
-   Serial.print(Soil_Moisture); // For Soil Moisture Sensor
+  Serial.print(Soil_Moisture); // For Soil Moisture Sensor
 
-   Serial.println("%"); // For Soil Moisture Sensor
+  Serial.println("%"); // For Soil Moisture Sensor
 
   int Temperature_Thermistor_Output = ThermistorTemp_Loop(); // For Thermistor Temperature Sensor
   
@@ -41,9 +43,14 @@ void loop() {
   Serial.print(Temperature_Thermistor_Output); // For Thermistor Temperature Sensor
   
   Serial.println(" C"); // For Thermistor Temperature Sensor
-   
 
-delay(1000);
+  int DHT11_Output = DHT11Temp_Loop(); // For DHT11 Temperature Sensor
+  
+  Serial.print("Temperature = "); // For DHT11 Temperature Sensor
+  
+  Serial.println(DHT11_Output); // For DHT11 Temperature Sensor 
+   
+  delay(1000);
    
    }
 
@@ -121,5 +128,18 @@ int ThermistorTemp_Loop()
   
   return ThermistorTemp_Tc;
   
+}
+
+void DHT11Temp_Setup()
+{
+  
+}
+
+int DHT11Temp_Loop()
+{
+  
+  int chk = DHT11Temp_DHT.read11(DHT11Temp_PIN);
+  int DHT11Temp_Output = DHT11Temp_DHT.temperature;
+  return DHT11Temp_Output;
 }
 
