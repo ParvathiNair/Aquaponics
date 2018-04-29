@@ -4,6 +4,8 @@
 
 #include <dht.h> // For DHT11 Temperature Sensor 
 
+#include <Servo.h> // For Automatic Fish Feeder
+
 #define LIQUIDTEMP_ONE_WIRE_BUS 2 // Digital Pin 2 for Liquid Temperature Sensor 
 
 #define DHT11Temp_PIN 7 // Digital Pin 7 for DHT11 Temperature Sensor
@@ -26,13 +28,23 @@ DallasTemperature LiquidTemp_sensors(&LiquidTemp_oneWire); //For Liquid Temperat
 
 dht DHT11Temp_DHT; //For DHT11 Temperature Sensor
 
-int soil_moisture_sensor_pin = A0; // For Soil Moisture Sensor
+Servo FishFeeder_MyServo; // For Automatic Fish Feeder
 
-int ThermistorTemp_ThermistorPin = A1; //Thermistor Temperature Analog Pin
+int soil_moisture_sensor_pin = A0; // Analog Pin 0 for Soil Moisture Sensor
+
+int ThermistorTemp_ThermistorPin = A1; //Thermistor Temperature Analog Pin 1
 
 int pHSensor_pHArray[pHSensor_ArrayLenth]; //Store the average value of the sensor feedback for pH Sensor
 
 int pHSensor_pHArrayIndex=0; // For pH Sensor 
+
+int FishFeeder_degreesOfRotation = 8; //For Fish Feeder
+
+int FishFeeder_servoPinNumber = 8; //Digital Pin 8 for Fish Feeder
+
+float FishFeeder_hoursBetweenMeals = 24; //For Fish Feeder
+
+float FishFeeder_mealDelayTime = 0; //For Fish Feeder
 
 void setup() {
 
@@ -41,8 +53,9 @@ void setup() {
   SoilMoistureSetup(); // For Soil Moisture Sensor
   ThermistorTemp_Setup(); // For Thermistor Temperature Sensor
   DHT11Temp_Setup(); // For DHT11 Temperature Sensor
-  phSensor_Setup();
-
+  phSensor_Setup(); // For pH Sensor
+  FishFeeder_Setup(); //For Fish Feeder
+  
    }
 
 void loop() {
@@ -80,6 +93,9 @@ void loop() {
   Serial.print("pH value: ");
   
   Serial.print(pHSensor_Output);
+
+  FishFeeder_Loop();
+
   
   delay(1000);
    
@@ -239,6 +255,30 @@ double avergearray(int* arr, int number){
     avg = (double)amount/(number-2);
   }//if
   return avg;
+}
+
+void FishFeeder_Setup()
+{
+    FishFeeder_MyServo.attach(FishFeeder_servoPinNumber);
+    FishFeeder_MyServo.write(FishFeeder_degreesOfRotation);
+    FishFeeder_mealDelayTime = FishFeeder_hoursBetweenMeals * 3600000;
+    delay(20);
+  
+}
+
+void FishFeeder_Loop()
+{
+  while(FishFeeder_degreesOfRotation < 152) {
+        FishFeeder_MyServo.write(FishFeeder_degreesOfRotation);
+        delay(10);
+        FishFeeder_degreesOfRotation += 1;
+    }
+    while(FishFeeder_degreesOfRotation > 8) {
+        FishFeeder_MyServo.write(FishFeeder_degreesOfRotation);
+        delay(10);
+        FishFeeder_degreesOfRotation -= 1;
+    }
+    delay(FishFeeder_mealDelayTime);
 }
 
 
