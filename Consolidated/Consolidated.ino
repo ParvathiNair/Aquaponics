@@ -4,8 +4,6 @@
 
 #include <dht.h> // For DHT11 Temperature Sensor 
 
-#include <Servo.h> // For Automatic Fish Feeder
-
 #define LIQUIDTEMP_ONE_WIRE_BUS 2 // Digital Pin 2 for Liquid Temperature Sensor 
 
 #define DHT11Temp_PIN 7 // Digital Pin 7 for DHT11 Temperature Sensor
@@ -28,8 +26,6 @@ DallasTemperature LiquidTemp_sensors(&LiquidTemp_oneWire); //For Liquid Temperat
 
 dht DHT11Temp_DHT; //For DHT11 Temperature Sensor
 
-Servo FishFeeder_MyServo; // For Automatic Fish Feeder
-
 int soil_moisture_sensor_pin = A0; // Analog Pin 0 for Soil Moisture Sensor
 
 int ThermistorTemp_ThermistorPin = A1; //Thermistor Temperature Analog Pin 1
@@ -38,13 +34,8 @@ int pHSensor_pHArray[pHSensor_ArrayLenth]; //Store the average value of the sens
 
 int pHSensor_pHArrayIndex=0; // For pH Sensor 
 
-int FishFeeder_degreesOfRotation = 8; //For Fish Feeder
+const int BackupWatering_MOISTURE_LEVEL = 250; // The Value After The LED Goes On for Backup Watering System
 
-int FishFeeder_servoPinNumber = 8; //Digital Pin 8 for Fish Feeder
-
-float FishFeeder_hoursBetweenMeals = 24; //For Fish Feeder
-
-float FishFeeder_mealDelayTime = 0; //For Fish Feeder
 
 void setup() {
 
@@ -53,10 +44,15 @@ void setup() {
   SoilMoistureSetup(); // For Soil Moisture Sensor
   ThermistorTemp_Setup(); // For Thermistor Temperature Sensor
   DHT11Temp_Setup(); // For DHT11 Temperature Sensor
-  phSensor_Setup(); // For pH Sensor
-  FishFeeder_Setup(); //For Fish Feeder
-  
+  phSensor_Setup(); // For pH Sensor  
+  BackupWatering_Setup(); // For BAckup Watering System
+
    }
+
+void LedState(int state)
+{
+  digitalWrite(13,state);  // Function for Backup Watering System 
+}
 
 void loop() {
 
@@ -94,7 +90,7 @@ void loop() {
   
   Serial.print(pHSensor_Output);
 
-  FishFeeder_Loop();
+  BackupWatering_Loop();
 
   
   delay(1000);
@@ -257,28 +253,28 @@ double avergearray(int* arr, int number){
   return avg;
 }
 
-void FishFeeder_Setup()
+void BackupWatering_Setup()
 {
-    FishFeeder_MyServo.attach(FishFeeder_servoPinNumber);
-    FishFeeder_MyServo.write(FishFeeder_degreesOfRotation);
-    FishFeeder_mealDelayTime = FishFeeder_hoursBetweenMeals * 3600000;
-    delay(20);
+  pinMode(13, OUTPUT);
+  pinMode(4, OUTPUT);
   
 }
 
-void FishFeeder_Loop()
+void BackupWatering_Loop()
 {
-  while(FishFeeder_degreesOfRotation < 152) {
-        FishFeeder_MyServo.write(FishFeeder_degreesOfRotation);
-        delay(10);
-        FishFeeder_degreesOfRotation += 1;
-    }
-    while(FishFeeder_degreesOfRotation > 8) {
-        FishFeeder_MyServo.write(FishFeeder_degreesOfRotation);
-        delay(10);
-        FishFeeder_degreesOfRotation -= 1;
-    }
-    delay(FishFeeder_mealDelayTime);
+  int moisture = analogRead(soil_moisture_sensor_pin);  
+  if(moisture > BackupWatering_MOISTURE_LEVEL)
+  {
+    LedState(HIGH);
+    digitalWrite(4,HIGH);
+  }
+  else 
+  {
+    LedState(LOW);
+    digitalWrite(4,LOW);
+  }
+  
+  delay(500);
 }
 
 
